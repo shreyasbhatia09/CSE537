@@ -89,12 +89,12 @@ def depthFirstSearch(problem):
 
     "*** YOUR CODE HERE ***"
 
+    # Create a stack for DFS traversal
     stk = util.Stack()
-    path = util.Stack()
-
+    # Empty list to store nodes visited and directions
     visitednodes = []
-    actions = []
 
+    # Get the initial state of Pacman
     startState = problem.getStartState()
     stk.push([startState, ""])
 
@@ -102,17 +102,23 @@ def depthFirstSearch(problem):
 
         currNode = stk.pop()
 
+        # If goal state found return the action list
         if problem.isGoalState(currNode[0]):
+            # From string create a new list by splitting ',' and removing NULL values
             return filter(None, currNode[1].split(","))
 
         elif currNode[0] in visitednodes:
+            # Ignore already visited nodes
             pass
 
         else:
+            # Mark node as visited
             visitednodes.append(currNode[0])
+            # Get all successors for the current node
             successors = (problem.getSuccessors(currNode[0]))
             for successor, action, cost in successors:
-                stk.push([successor, currNode[1]+","+action])
+                # Add the node and the directions to the stack
+                stk.push([successor, currNode[1] + "," + action])
 
 
 def breadthFirstSearch(problem):
