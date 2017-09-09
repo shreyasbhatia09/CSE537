@@ -124,7 +124,37 @@ def depthFirstSearch(problem):
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # Create a stack for DFS traversal
+    queue = util.Queue()
+    # Empty list to store nodes visited and directions
+    visitednodes = []
+
+    # Get the initial state of Pacman
+    startState = problem.getStartState()
+    queue.push([startState, ""])
+
+    while not queue.isEmpty():
+
+        currNode = queue.pop()
+
+        # If goal state found return the action list
+        if problem.isGoalState(currNode[0]):
+            # From string create a new list by splitting ',' and removing NULL values
+            return filter(None, currNode[1].split(","))
+
+        elif currNode[0] in visitednodes:
+            # Ignore already visited nodes
+            pass
+
+        else:
+            # Mark node as visited
+            visitednodes.append(currNode[0])
+            # Get all successors for the current node
+            successors = (problem.getSuccessors(currNode[0]))
+            for successor, action, cost in successors:
+                # Add the node and the directions to the stack
+                queue.push([successor, currNode[1] + "," + action])
+
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
