@@ -88,26 +88,32 @@ def depthFirstSearch(problem):
     """
 
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
     stk = util.Stack()
-    startState = problem.getStartState()
-    stk.push(startState)
+    path = util.Stack()
+
     visitednodes = []
     actions = []
+
+    startState = problem.getStartState()
+    stk.push([startState, ""])
+
     while not stk.isEmpty():
+
         currNode = stk.pop()
 
-        if problem.isGoalState(currNode):
-            return actions
+        if problem.isGoalState(currNode[0]):
+            return filter(None, currNode[1].split(","))
 
-        elif currNode in visitednodes:
+        elif currNode[0] in visitednodes:
             pass
 
         else:
-            successors = problem.getSuccessors(problem.getSuccessors(currNode))
+            visitednodes.append(currNode[0])
+            successors = (problem.getSuccessors(currNode[0]))
             for successor, action, cost in successors:
-                print successor, action, cost
-    return []
+                stk.push([successor, currNode[1]+","+action])
+
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
