@@ -98,7 +98,9 @@ def depthFirstSearch(problem):
     startState = problem.getStartState()
     stk.push([startState, ""])
 
-    while not stk.isEmpty():
+    while(True):
+
+        if stk.isEmpty():break
 
         currNode = stk.pop()
 
@@ -107,11 +109,7 @@ def depthFirstSearch(problem):
             # From string create a new list by splitting ',' and removing NULL values
             return filter(None, currNode[1].split(","))
 
-        elif currNode[0] in visitednodes:
-            # Ignore already visited nodes
-            pass
-
-        else:
+        elif not currNode[0] in visitednodes:
             # Mark node as visited
             visitednodes.append(currNode[0])
             # Get all successors for the current node
@@ -133,20 +131,15 @@ def breadthFirstSearch(problem):
     startState = problem.getStartState()
     queue.push([startState, ""])
 
-    while not queue.isEmpty():
+    while (True):
 
+        if queue.isEmpty(): break
         currNode = queue.pop()
-
         # If goal state found return the action list
         if problem.isGoalState(currNode[0]):
             # From string create a new list by splitting ',' and removing NULL values
             return filter(None, currNode[1].split(","))
-
-        elif currNode[0] in visitednodes:
-            # Ignore already visited nodes
-            pass
-
-        else:
+        elif not currNode[0] in visitednodes:
             # Mark node as visited
             visitednodes.append(currNode[0])
             # Get all successors for the current node
@@ -165,7 +158,9 @@ def uniformCostSearch(problem):
     # Empty list to store nodes visited and directions
     visitednodes = []
 
-    while not priorityQ.isEmpty():
+    while (True):
+
+        if priorityQ.isEmpty():break
         currNode = priorityQ.pop()
 
         # If goal state found return the action list
@@ -174,10 +169,7 @@ def uniformCostSearch(problem):
             # From string create a new list by splitting ',' and removing NULL values
             return filter(None, currNode[1].split(","))
 
-        elif currNode[0] in visitednodes:
-            pass
-
-        else:
+        elif not currNode[0] in visitednodes:
             visitednodes.append(currNode[0])
             successors = problem.getSuccessors(currNode[0])
             print successors
@@ -194,8 +186,30 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
 
+
+    priorityQ = util.PriorityQueue()
+    startState = problem.getStartState()
+    priorityQ.push([startState, "", 0], 0)
+    # Empty list to store nodes visited and directions
+    visitednodes = []
+
+    while (True):
+
+        if priorityQ.isEmpty():break
+        currNode = priorityQ.pop()
+
+        # If goal state found return the action list
+        if problem.isGoalState(currNode[0]):
+            # From string create a new list by splitting ',' and removing NULL values
+            return filter(None, currNode[1].split(","))
+
+        elif not currNode[0] in visitednodes:
+            visitednodes.append(currNode[0])
+            successors = problem.getSuccessors(currNode[0])
+            print successors
+            for successor, action, cost in successors:
+                priorityQ.push([successor, (currNode[1] + "," + action), cost + currNode[2] ], (cost + currNode[2]) + (heuristic(successor, problem)))
 
 # Abbreviations
 bfs = breadthFirstSearch
