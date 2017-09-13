@@ -172,7 +172,6 @@ def uniformCostSearch(problem):
         elif not currNode[0] in visitednodes:
             visitednodes.append(currNode[0])
             successors = problem.getSuccessors(currNode[0])
-            print successors
             for successor, action, cost in successors:
                 priorityQ.push([successor, (currNode[1] + "," + action), cost + currNode[2] ], cost + currNode[2] )
 
@@ -207,9 +206,8 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         elif not currNode[0] in visitednodes:
             visitednodes.append(currNode[0])
             successors = problem.getSuccessors(currNode[0])
-            print successors
             for successor, action, cost in successors:
-                priorityQ.push([successor, (currNode[1] + "," + action), cost + currNode[2] ], (cost + currNode[2]) + (heuristic(successor, problem)))
+                priorityQ.push([successor, (currNode[1] + "," + action), cost + currNode[2] ], cost + currNode[2] + heuristic(successor, problem))
 
 # Abbreviations
 bfs = breadthFirstSearch
