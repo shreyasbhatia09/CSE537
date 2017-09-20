@@ -503,7 +503,7 @@ def foodHeuristic(state, problem):
     # if there is no food left return 0
     if len(foodCoordinates) == 0 : return 0
 
-    # Initilize the nearest food varible with the first element
+    # Initialize the nearest food variable with the first element
     nearest_food, min_cost = foodCoordinates[0], util.manhattanDistance(position, foodCoordinates[0])
 
     for i in range(1, len(foodCoordinates)):
