@@ -164,15 +164,18 @@ def uniformCostSearch(problem):
         currNode = priorityQ.pop()
 
         # If goal state found return the action list
-
         if problem.isGoalState(currNode[0]):
             # From string create a new list by splitting ',' and removing NULL values
             return filter(None, currNode[1].split(","))
 
         elif not currNode[0] in visitednodes:
+            # Check node in visitednodes list or not
             visitednodes.append(currNode[0])
+            # get the next successor
             successors = problem.getSuccessors(currNode[0])
+            # Push the state, cost uptil now to the queue state. The cost will also be passed to Priority Q as an argument
             for successor, action, cost in successors:
+                # cost + currNode[2] cost is the cost uptil now
                 priorityQ.push([successor, (currNode[1] + "," + action), cost + currNode[2] ], cost + currNode[2] )
 
 def nullHeuristic(state, problem=None):
@@ -204,8 +207,12 @@ def aStarSearch(problem, heuristic=nullHeuristic):
             return filter(None, currNode[1].split(","))
 
         elif not currNode[0] in visitednodes:
+            # Check node in visitednodes list or not
             visitednodes.append(currNode[0])
+            # get the next successor
             successors = problem.getSuccessors(currNode[0])
+            # Push the state, cost uptil now to the queue state. The cost will also be passed to Priority Q as an argument
+            # Also we need to add the heuristic cost as well because f = h + g
             for successor, action, cost in successors:
                 priorityQ.push([successor, (currNode[1] + "," + action), cost + currNode[2] ], cost + currNode[2] + heuristic(successor, problem))
 
