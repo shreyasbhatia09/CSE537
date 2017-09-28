@@ -44,6 +44,7 @@ class ReflexAgent(Agent):
         # Choose one of the best actions
         scores = [self.evaluationFunction(gameState, action) for action in legalMoves]
         bestScore = max(scores)
+        print bestScore
         bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
         chosenIndex = random.choice(bestIndices) # Pick randomly among the best
 
@@ -73,8 +74,50 @@ class ReflexAgent(Agent):
         newGhostStates = successorGameState.getGhostStates()
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
+
         "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+        score = successorGameState.getScore()
+
+        reward = 0
+        penalty =0
+        infinity = 999999999999
+        closest_food = infinity
+        closest_ghost = infinity
+        remaining_food = successorGameState.getNumFood()
+        farthest_food = -1 * infinity
+
+        # If remaining_food is 0 make it one for integer division
+        remaining_food = remaining_food if remaining_food != 0 else  1
+
+        # Use food to calculate score
+        for foodpos in newFood.asList():
+            closest_food = min(util.manhattanDistance(newPos, foodpos), closest_food)
+            farthest_food = max(util.manhattanDistance(newPos, foodpos), farthest_food)
+
+        if closest_food == 0:
+            reward += 100
+            closest_food = 1
+
+        farthest_food = farthest_food if farthest_food != 0 else 1
+
+        # Use ghost to calculate score
+        manhattanDist = lambda x,y : util.manhattanDistance(x,y)
+        closest_ghost = min([ manhattanDist(ghostPos.getPosition(), newPos) for ghostPos in newGhostStates ])
+
+        if closest_ghost == 0:
+            penalty += infinity,
+            closest_ghost = 1
+
+        score = float(score)
+
+        score = score - float(1)/closest_ghost + \
+                (float(1)/ closest_food) \
+                + reward - penalty + \
+                float(1)/remaining_food + \
+                float(1)/farthest_food
+
+        return score if action != 'Stop' else -1*infinity
+
 
 def scoreEvaluationFunction(currentGameState):
     """
