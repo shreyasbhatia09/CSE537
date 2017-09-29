@@ -182,7 +182,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
             res = infinity if agentIndex != 0 else -1*infinity
 
             for action in game_state.getLegalActions(agentIndex):
-                if action == 'Stop': continue
+
                 successor_state = game_state.generateSuccessor(agentIndex, action)
                 if agentIndex ==0:
                     res = max(res, minimax(successor_state, agentIndex+1, depth, max_depth))
@@ -198,7 +198,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
         max_depth = self.depth
 
         for action in gameState.getLegalActions(self.index):
-            if action == 'Stop': continue
             successor = gameState.generateSuccessor(curr_agent, action)
             score = minimax(successor, curr_agent+1, 1, max_depth)
             if score > maxscore:
@@ -230,7 +229,6 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             res = infinity if agentIndex != 0 else -1 * infinity
 
             for action in game_state.getLegalActions(agentIndex):
-                if action == 'Stop': continue
                 successor_state = game_state.generateSuccessor(agentIndex, action)
                 if agentIndex == 0:
                     val =  alphabeta(successor_state, agentIndex + 1, depth, max_depth, alpha, beta)
@@ -254,7 +252,6 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         alpha = -1 * infinity
         beta = infinity
         for action in gameState.getLegalActions(self.index):
-            if action == 'Stop': continue
             successor = gameState.generateSuccessor(curr_agent, action)
             val = alphabeta(successor, curr_agent + 1, 1, max_depth, alpha, beta)
             if val > curr_score:
@@ -280,24 +277,27 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         "*** YOUR CODE HERE ***"
         infinity = float(9999999999999999)
         def minimax(game_state, agentIndex, depth, max_depth):
+
             if agentIndex == game_state.getNumAgents():
                 depth += 1
                 agentIndex = 0
 
-            if game_state.isWin() or game_state.isLose() or depth == max_depth + 1:
-                return self.evaluationFunction(game_state)
+            if game_state.isWin() or game_state.isLose() or depth == max_depth:
+                return float(self.evaluationFunction(game_state))
 
-            res = infinity if agentIndex != 0 else -1 * infinity
+            res = 0.0 if agentIndex != 0 else -1 * infinity
 
             legal_moves = game_state.getLegalActions(agentIndex)
             prob = float(1)/len(legal_moves)
+
             for action in legal_moves:
-                if action == 'Stop': continue
                 successor_state = game_state.generateSuccessor(agentIndex, action)
                 if agentIndex == 0:
-                    res = max(res, minimax(successor_state, agentIndex + 1, depth, max_depth))
+                    res = float(max(res, minimax(successor_state, agentIndex + 1, depth, max_depth)))
                 else:
-                    res += prob * minimax(successor_state, agentIndex + 1, depth, max_depth)
+
+                    res += prob * float(minimax(successor_state, agentIndex + 1, depth, max_depth))
+
             return res
 
         # get action
@@ -307,9 +307,8 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         max_depth = self.depth
 
         for action in gameState.getLegalActions(self.index):
-            if action == 'Stop': continue
             successor = gameState.generateSuccessor(curr_agent, action)
-            score = minimax(successor, curr_agent + 1, 1, max_depth)
+            score = float(minimax(successor, curr_agent + 1, 0, max_depth))
             if score > maxscore:
                 result = action
                 maxscore = score
