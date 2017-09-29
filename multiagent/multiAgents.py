@@ -182,6 +182,8 @@ class MinimaxAgent(MultiAgentSearchAgent):
             res = 9999999999999999 if agentIndex != 0 else -1*9999999999999999
 
             for action in game_state.getLegalActions(agentIndex):
+                if action == 'Stop':
+                    continue
                 successor_state = game_state.generateSuccessor(agentIndex, action)
                 if agentIndex ==0:
                     res = max(res, minimax(successor_state, agentIndex+1, depth, max_depth))
