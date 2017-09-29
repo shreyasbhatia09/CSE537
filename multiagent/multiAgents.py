@@ -216,8 +216,54 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
           Returns the minimax action using self.depth and self.evaluationFunction
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        infinity = 9999999999999999
+
+        def alphabeta(game_state, agentIndex, depth, max_depth, alpha, beta):
+
+            if agentIndex == game_state.getNumAgents():
+                depth += 1
+                agentIndex = 0
+
+            if game_state.isWin() or game_state.isLose() or depth == max_depth + 1:
+                return self.evaluationFunction(game_state)
+
+            res = infinity if agentIndex != 0 else -1 * infinity
+
+            for action in game_state.getLegalActions(agentIndex):
+                if action == 'Stop': continue
+                successor_state = game_state.generateSuccessor(agentIndex, action)
+                if agentIndex == 0:
+                    val =  alphabeta(successor_state, agentIndex + 1, depth, max_depth, alpha, beta)
+                    res = max(res, val)
+                    if res > beta: return res
+                    alpha = max(alpha, res)
+
+                else:
+                    val = alphabeta(successor_state, agentIndex + 1, depth, max_depth, alpha, beta)
+                    res = min(res, val)
+                    if res < alpha: return res
+                    beta = min(beta, res)
+
+            return res
+        # get action
+        result = ""
+        curr_score = -1*infinity
+        maxscore = -1 * infinity
+        curr_agent = self.index
+        max_depth = self.depth
+        alpha = -1 * infinity
+        beta = infinity
+        for action in gameState.getLegalActions(self.index):
+            if action == 'Stop': continue
+            successor = gameState.generateSuccessor(curr_agent, action)
+            val = alphabeta(successor, curr_agent + 1, 1, max_depth, alpha, beta)
+            if val > curr_score:
+                curr_score = val
+                result = action
+            if val > beta:
+                return result
+            alpha = max(alpha, val)
+        return result
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
