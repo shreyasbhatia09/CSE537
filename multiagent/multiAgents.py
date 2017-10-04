@@ -76,7 +76,7 @@ class ReflexAgent(Agent):
 
         "*** YOUR CODE HERE ***"
         score = successorGameState.getScore()
-
+        # Initialize variables
         reward = 0
         penalty = 0
         infinity = 999999999999
@@ -93,26 +93,34 @@ class ReflexAgent(Agent):
             closest_food = min(util.manhattanDistance(newPos, food_pos), closest_food)
             farthest_food = max(util.manhattanDistance(newPos, food_pos), farthest_food)
 
+        # Add reward if the next position is a food pellet
         if closest_food == 0:
             reward += 100
             closest_food = 1
-
+        # To avoid division by 0
         farthest_food = farthest_food if farthest_food != 0 else 1
 
         # Use ghost to calculate score
         manhattan_dist = lambda x,y : util.manhattanDistance(x,y)
         closest_ghost = min([manhattan_dist(ghostPos.getPosition(), newPos) for ghostPos in newGhostStates])
 
+        # if next position is ghost avoid it all cost, hence return -infinity
         if closest_ghost == 0:
             penalty = float(infinity)
             closest_ghost = 1
 
+        # Calculate the final score.
+        # The final score can be calculated by using the current score and the following factors
+        # Distance of closest food from pacman
+        # distance of farthest food from pacman
+        # number of food pellets remaining
+        # Add the reward (next state if food) and subtract the penalty (next state is ghost)
         score = float(score) - float(1)/closest_ghost + \
                 (float(1)/ closest_food) \
                 + reward - penalty + \
                 float(1)/remaining_food + \
                 float(1)/farthest_food
-
+        # Return score if action is not stop
         return score if action != 'Stop' else -1*infinity
 
 def scoreEvaluationFunction(currentGameState):
@@ -169,37 +177,46 @@ class MinimaxAgent(MultiAgentSearchAgent):
           gameState.getNumAgents():
             Returns the total number of agents in the game
         """
+        # Initialize the infinity variable
         infinity = 9999999999999999
+        # A recursive helper function which will return the best score calculated using min-max tree
         def minimax(game_state, agentIndex, depth, max_depth):
-
+            # We are going to the increase the depth only when we have completed one ply ie pacman and 'N' ghosts
             if agentIndex == game_state.getNumAgents():
                 depth += 1
                 agentIndex = 0
-
+            # Base case:
             if game_state.isWin() or game_state.isLose() or depth == max_depth+1:
                 return self.evaluationFunction(game_state)
 
             res = infinity if agentIndex != 0 else -1*infinity
 
             for action in game_state.getLegalActions(agentIndex):
-
+                # Calculate the successor
                 successor_state = game_state.generateSuccessor(agentIndex, action)
+                # If the current agent is Pacman then we execute 'max' step
                 if agentIndex ==0:
+                    # take max of all children
                     res = max(res, minimax(successor_state, agentIndex+1, depth, max_depth))
+                # current agent is a ghost
                 else:
+                    # take minimum of all children
                     res = min(res, minimax(successor_state, agentIndex+1, depth, max_depth))
 
             return res
 
-        #get action
+        #Get Action Code Starts here
         result = ""
         maxscore = -1*infinity
         curr_agent = self.index
         max_depth = self.depth
-
+        # Looking at all the legal actions of the root node
         for action in gameState.getLegalActions(self.index):
+            # generate all successors
             successor = gameState.generateSuccessor(curr_agent, action)
+            # calculate score of all the child nodes of the tree
             score = minimax(successor, curr_agent+1, 1, max_depth)
+            # if the current score is greater than max return this score
             if score > maxscore:
                 result = action
                 maxscore = score
@@ -275,16 +292,17 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
           legal moves.
         """
         "*** YOUR CODE HERE ***"
+        # Adding variable which will store infinity
         infinity = float(9999999999999999)
         def minimax(game_state, agentIndex, depth, max_depth):
-
+            # if we reach the maximum number of agents we will increase the depth by 1. One ply completed here
             if agentIndex == game_state.getNumAgents():
                 depth += 1
                 agentIndex = 0
-
+            # Base case
             if game_state.isWin() or game_state.isLose() or depth == max_depth:
                 return float(self.evaluationFunction(game_state))
-
+            # Initialize result
             res = 0.0 if agentIndex != 0 else -1 * infinity
 
             legal_moves = game_state.getLegalActions(agentIndex)
