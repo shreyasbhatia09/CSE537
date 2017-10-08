@@ -63,9 +63,11 @@ def BT(L, M):
     "*** YOUR CODE HERE ***"
     res = []
     res_list = backtracking_helper([], 0, L, M)
-    if len(res_list) == 0:
-        res = -1
-    else: return 1
+
+    if res_list[0] == infinity or len(res_list)==0:
+        return -1, []
+
+    res = res_list[M-1]
     return res, res_list
 
 # Your backtracking+Forward checking function implementation
