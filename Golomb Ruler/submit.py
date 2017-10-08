@@ -8,7 +8,7 @@
 import copy
 from collections import defaultdict
 
-infinity = 99999999999999
+infinity = 9999999999999
 
 
 def check_constraints(list):
@@ -21,7 +21,7 @@ def check_constraints(list):
     return True
 
 
-def listinit(a, M):
+def list_init(a, M):
     if len(a) == 0:
         return [infinity] * M
     else:
@@ -50,8 +50,8 @@ def backtracking_helper(list, index, L, M):
     res2 = copy.deepcopy(backtracking_helper(list, index + 1, L, M))
 
     # Initialize if null
-    res1 = listinit(res1, M)
-    res2 = listinit(res2, M)
+    res1 = list_init(res1, M)
+    res2 = list_init(res2, M)
 
     if res1[M - 1] > res2[M - 1]:
         return res2
