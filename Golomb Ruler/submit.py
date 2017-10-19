@@ -5,10 +5,9 @@
 
 # Your backtracking function implementation
 
-import copy
 from collections import defaultdict
-
-infinity = 9999999999999
+import copy
+infinity = 99999999999999
 
 
 def check_constraints(list):
@@ -29,51 +28,101 @@ def list_init(a, M):
 
 
 def backtracking_helper(list, index, L, M):
+
     # Check base case
     if index > L + 1:
         return []
 
+    # check constraints as you go
+    if not check_constraints(list):
+        return []
+
+    # if we found a list with size M check its validity and return accordingly
     if len(list) == M:
         if check_constraints(list):
             return list
         else:
             return []
 
-    # Add current number
-    list.append(index)
-    res1 = copy.deepcopy(backtracking_helper(list, index + 1, L, M))
+    # This will store the list with the smallest L
+    max_res = []
 
-    # Backtrack and find another solution
-    list.remove(index)
-
-    # increase current index
-    res2 = copy.deepcopy(backtracking_helper(list, index + 1, L, M))
-
-    # Initialize if null
-    res1 = list_init(res1, M)
-    res2 = list_init(res2, M)
-
-    if res1[M - 1] > res2[M - 1]:
-        return res2
-    else:
-        return res1
+    # Recur for all values
+    for i in range(index, L+1):
+        list.append(i)
+        res = copy.deepcopy(backtracking_helper(list, i + 1, L, M))
+        # the most important backtracking step.
+        list.remove(i)
+        res = copy.deepcopy(list_init(res, M))
+        max_res = copy.deepcopy(list_init(max_res, M))
+        if res[M-1] < max_res[M-1]:
+            max_res = copy.deepcopy(res)
+    return max_res
 
 
 def BT(L, M):
     "*** YOUR CODE HERE ***"
     res = []
-    res_list = backtracking_helper([], 0, L, M)
-
-    if res_list[0] == infinity or len(res_list)==0:
+    res = backtracking_helper([], 0, L, M)
+    if res[0] == 99999999999999:
         return -1, []
+    else:
+        return res[M-1], res
 
-    res = res_list[M-1]
-    return res, res_list
+def forward_check( val, list):
+    forward_list = copy.deepcopy(list)
+    forward_list.append(val)
+    return check_constraints(forward_list)
+
+def forward_checking_helper(list, index, L, M):
+
+    # Check base case
+    if index > L + 1:
+        return []
+
+    # check constraints as you go
+    if not check_constraints(list):
+        return []
+
+    # if we found a list with size M check its validity and return accordingly
+    if len(list) == M:
+        if check_constraints(list):
+            return list
+        else:
+            return []
+
+    # This will store the list with the smallest L
+    max_res = []
+
+    # Recur for all values
+    for i in range(index, L+1):
+
+        # Forward Checking
+        if not forward_check(i,list):
+            continue
+
+        list.append(i)
+
+        res = copy.deepcopy(backtracking_helper(list, i + 1, L, M))
+        # the most important backtracking step.
+        list.remove(i)
+        res = copy.deepcopy(list_init(res, M))
+        max_res = copy.deepcopy(list_init(max_res, M))
+        if res[M-1] < max_res[M-1]:
+            max_res = copy.deepcopy(res)
+
+    return max_res
 
 # Your backtracking+Forward checking function implementation
 def FC(L, M):
     "*** YOUR CODE HERE ***"
-    return -1, []
+    res = []
+    res = forward_checking_helper([], 0, L, M)
+    # solution not found
+    if res[0] == 99999999999999:
+        return -1, []
+    else:
+        return res[M-1], res
 
 
 # Bonus: backtracking + constraint propagation
@@ -82,5 +131,7 @@ def CP(L, M):
     return -1, []
 
 
-flist = backtracking_helper([], 0, 7, 4)
+flist = backtracking_helper([], 0, 25, 7)
 print flist
+flist2 = forward_checking_helper([], 0, 25, 7)
+print flist2
