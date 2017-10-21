@@ -6,123 +6,178 @@
 # Your backtracking function implementation
 
 from collections import defaultdict
+import timeit
 import copy
+import time
+
 infinity = 99999999999999
 
-
 def check_constraints(list):
+    """
+        check wether the list satisfies the
+        Golumb Ruler constraints
+    """
+    if len(list) != len(set(list)):
+        return []
+    # Create a dictionary of difference between every i and j
     diff = defaultdict(int)
     diff_list = [abs(i - j) for i in list for j in list if i != j]
     for i in diff_list:
         diff[i] += 1
-        if diff[i] == 3:
+        if diff[i] > 2:
             return False
+    # if constraints are passed return true
     return True
 
 
 def list_init(a, M):
+    """
+       Return a list with
+       M infinity values
+       if the length of the list is 0
+    """
     if len(a) == 0:
         return [infinity] * M
     else:
         return a
 
 
-def backtracking_helper(list, index, L, M):
+def backtracking_helper(list, index, L, M, checks):
+
+    """
+        Helper module for backtracking.
+        This utility function performs the
+        necesssary recursion
+    """
 
     # Check base case
     if index > L + 1:
-        return []
+        return [], checks
 
     # check constraints as you go
     if not check_constraints(list):
-        return []
+        return [], checks
 
     # if we found a list with size M check its validity and return accordingly
     if len(list) == M:
         if check_constraints(list):
-            return list
+            return list, checks
+
         else:
-            return []
+            return [], checks
 
     # This will store the list with the smallest L
-    max_res = []
-
+    optimal_soln = list_init([], M)
     # Recur for all values
-    for i in range(index, L+1):
+    # Recur for all values in the domain
+    checks += 1
+    checks_temp=0
+    for i in range(0, L+1):
+        if (i==index):
+            continue
         list.append(i)
-        res = copy.deepcopy(backtracking_helper(list, i + 1, L, M))
-        # the most important backtracking step.
+        resList, checks_temp = backtracking_helper(list, i + 1, L, M,0)
+        checks = checks + checks_temp
+        res = copy.deepcopy(resList)
+        # Backtrack
         list.remove(i)
-        res = copy.deepcopy(list_init(res, M))
-        max_res = copy.deepcopy(list_init(max_res, M))
-        if res[M-1] < max_res[M-1]:
-            max_res = copy.deepcopy(res)
-    return max_res
+        # Compare result to find optimal solution
+        res = list_init(res, M)
+        res.sort()
+        if res[M - 1] < optimal_soln[M - 1]:
+            optimal_soln = res
+
+    return optimal_soln, checks
 
 
 def BT(L, M):
     "*** YOUR CODE HERE ***"
     res = []
-    res = backtracking_helper([], 0, L, M)
+    res, checks = backtracking_helper([0], 1, L, M, 0)
     if res[0] == 99999999999999:
         return -1, []
     else:
+        print checks
         return res[M-1], res
 
-def forward_check( val, list):
-    forward_list = copy.deepcopy(list)
-    forward_list.append(val)
-    return check_constraints(forward_list)
 
-def forward_checking_helper(list, index, L, M):
+def forward_check(index, L, list):
+    """
+        Returns a list of allowed values
+        with respect to the golumb ruler constraints
+    """
+
+    def list_diff(A, B):
+        return [val for val in A if val not in set(B)]
+
+    diff = defaultdict(int)
+    diff_list = [abs(i - j) for i in list for j in list if i != j]
+    for i in diff_list:
+        diff[i] += 1
+
+    not_allowed_values = [i for i in diff if diff[i] > 2]
+    allowed_values = range(index, L+1)
+
+    return list_diff(allowed_values, not_allowed_values)
+
+
+def forward_checking_helper(list, index, L, M, checks):
+    """
+        Helper module for backtracking with Forward checking.
+        This utility function performs the
+        necesssary recursion
+    """
 
     # Check base case
     if index > L + 1:
-        return []
+        return [],checks
 
     # check constraints as you go
     if not check_constraints(list):
-        return []
+        return [],checks
 
     # if we found a list with size M check its validity and return accordingly
     if len(list) == M:
         if check_constraints(list):
-            return list
+            return list, checks
         else:
-            return []
+            return [],checks
 
-    # This will store the list with the smallest L
-    max_res = []
+    # Create a new domain by removing values
+    # which do not satisfy the constraint
+    forward_check_values = forward_check(index, L, list)
 
-    # Recur for all values
-    for i in range(index, L+1):
-
-        # Forward Checking
-        if not forward_check(i,list):
-            continue
-
+    # Recur for all values which satisfy the constraint
+    optimal_soln = list_init([], M)
+    checks += 1
+    checks_temp = 0
+    for i in forward_check_values:
+        # Append to the list and recur
         list.append(i)
-
-        res = copy.deepcopy(backtracking_helper(list, i + 1, L, M))
-        # the most important backtracking step.
+        resList ,checks_temp = forward_checking_helper(list, i + 1, L, M, 0)
+        checks = checks + checks_temp
+        res1 = copy.deepcopy(resList)
+        # Remove from the list for backtracking
         list.remove(i)
-        res = copy.deepcopy(list_init(res, M))
-        max_res = copy.deepcopy(list_init(max_res, M))
-        if res[M-1] < max_res[M-1]:
-            max_res = copy.deepcopy(res)
+        # Compare result for optimal solution
+        res1 = list_init(res1,M)
+        res1.sort()
+        if res1[M-1] < optimal_soln[M-1]:
+            optimal_soln = res1
+    return optimal_soln, checks
 
-    return max_res
 
 # Your backtracking+Forward checking function implementation
 def FC(L, M):
-    "*** YOUR CODE HERE ***"
     res = []
-    res = forward_checking_helper([], 0, L, M)
+    res, checks = forward_checking_helper([0], 1, L, M, 0)
     # solution not found
     if res[0] == 99999999999999:
         return -1, []
     else:
+        print checks
         return res[M-1], res
+
 
 
 # Bonus: backtracking + constraint propagation
@@ -131,7 +186,14 @@ def CP(L, M):
     return -1, []
 
 
-flist = backtracking_helper([], 0, 25, 7)
-print flist
-flist2 = forward_checking_helper([], 0, 25, 7)
-print flist2
+# M = 8
+# L = 35
+# start_time = time.time()
+# flist = BT(L, M)
+# end_time = time.time()
+# print flist, (end_time-start_time)
+#
+# start_time = time.time()
+# flist2 = FC(L, M)
+# end_time = time.time()
+# print flist2, (end_time-start_time)
