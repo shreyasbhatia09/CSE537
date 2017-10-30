@@ -149,14 +149,7 @@ class ExactInference(InferenceModule):
         pacmanPosition = gameState.getPacmanPosition()
 
         "*** YOUR CODE HERE ***"
-        print "Start"
-        print self.getJailPosition()
-        print noisyDistance
-        print emissionModel
-        print pacmanPosition
-        print self.beliefs
-        print self.legalPositions
-        print "end"
+
         # Replace this code with a correct observation update
         # Be sure to handle the "jail" edge case where the ghost is eaten
         # and noisyDistance is None
