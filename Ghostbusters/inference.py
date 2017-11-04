@@ -165,7 +165,7 @@ class ExactInference(InferenceModule):
             prob = emissionModel[trueDistance]
             if prob > 0:
                 conditional_prob = prob * self.beliefs[p]
-                # P(noisyDistance | TrueDistance) * self.beliefs[p]
+                # P(noisyDistance | TrueDistance) * P(B=p)
                 allPossible[p] = conditional_prob
 
         "*** END YOUR CODE HERE ***"
@@ -227,7 +227,17 @@ class ExactInference(InferenceModule):
         positions after a time update from a particular position.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        temp = util.Counter()
+        for oldPos in self.legalPositions:
+            # print oldPos
+            newPosDist = self.getPositionDistribution(self.setGhostPosition(gameState, oldPos))
+            # print newPosDist
+            for x,y in newPosDist:
+                pos = (x,y)
+                pr = newPosDist[pos]
+                temp[pos] = (pr * self.beliefs[oldPos]) + temp[pos]
+        temp.normalize()
+        self.beliefs = temp
 
     def getBeliefDistribution(self):
         return self.beliefs
