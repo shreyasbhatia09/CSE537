@@ -156,6 +156,7 @@ class GreedyBustersAgent(BustersAgent):
              indices into this list should be 1 less than indices into the
              gameState.getLivingGhosts() list.
         """
+        import operator
         pacmanPosition = gameState.getPacmanPosition()
         legal = [a for a in gameState.getLegalPacmanActions()]
         livingGhosts = gameState.getLivingGhosts()
@@ -163,6 +164,39 @@ class GreedyBustersAgent(BustersAgent):
             [beliefs for i, beliefs in enumerate(self.ghostBeliefs)
              if livingGhosts[i+1]]
         "*** YOUR CODE HERE ***"
-        print pacmanPosition
-        print livingGhostPositionDistributions
-        print livingGhosts
+        infinity = 999999999999999
+        max_prob = -1.0
+        best_val = None
+        best_val_prob = 0.0
+        best_val_list = []
+
+        for distributions in livingGhostPositionDistributions:
+            for pos, prob in distributions.iteritems():
+                if best_val_prob < prob:
+                    best_val = pos
+                    best_val_prob = prob
+            best_val_list.append(best_val)
+
+        def mazedistance(pos1, pos2):
+            return self.distancer.getDistance(pos1, pos2)
+
+        min_dist = infinity
+        for x in best_val_list:
+            curr_dist = mazedistance(pacmanPosition, x)
+            if curr_dist < min_dist:
+                min_dist = curr_dist
+                best_val = x
+
+        min_dist = infinity
+        best_action=None
+        for action in legal:
+            successorPosition = Actions.getSuccessor(pacmanPosition, action)
+            curr_dist = mazedistance(best_val, successorPosition)
+            if curr_dist < min_dist:
+                min_dist = curr_dist
+                best_action = action
+        return best_action
+
+
+
+
